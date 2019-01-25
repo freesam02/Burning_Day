@@ -20,12 +20,14 @@ class MarketData(Resource):
 
         code_data = args['code']
         #print(code_data)
-
+        if code_data == 6:
+            return {'price_now': 0}
         url = 'https://sandbox-apigw.koscom.co.kr/v2/market/stocks/{marketcode}/{issuecode}/price'.replace('{marketcode}', 'kospi').replace('{issuecode}',str(code_data))+'?'+'apikey'+'=l7xx30a19d389f204686a4b2a0e150ade045'
 
         response = requests.get(url)
 
         result= json.loads(response.content)
+
         try:
             price =  result['result']['trdPrc']
         except KeyError:
@@ -43,6 +45,8 @@ class Company(Resource):
         parser.add_argument('code',type=str)
         args = parser.parse_args()
         code_data = args['code']
+        if code_data == 6:
+            return {'price_now': 0}
         url = "https://finance.naver.com/item/main.nhn?code="+str(code_data)
         html = urlopen(url)
         bsObject = BeautifulSoup(html, "html.parser")
@@ -67,6 +71,8 @@ class RelatedCompany(Resource):
         args = parser.parse_args()
 
         code_data = args['code']
+        if code_data == 6:
+            return {'price_now': 0}
         url = "https://finance.naver.com/item/main.nhn?code="+str(code_data)
         html = urlopen(url)
         bsObject = BeautifulSoup(html, "html.parser")
