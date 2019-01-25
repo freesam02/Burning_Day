@@ -26,8 +26,8 @@ public class RecommendStockApi {
 	Logger logger = LoggerFactory.getLogger(RecommendStockApi.class);
 	
     private static String URI_PREFIX = "http://localhost:8888/logpresso/httpexport/query.json";
-	//private static String APIKEY = "847d4dcc-7284-bfa5-e447-b3c48cded77b";
-	private static String APIKEY = "dd579650-45ca-4b3a-1fc4-57308be36625";
+	private static String APIKEY = "847d4dcc-7284-bfa5-e447-b3c48cded77b";
+	//private static String APIKEY = "dd579650-45ca-4b3a-1fc4-57308be36625";
 	
 	Map<String, Object> map = new HashMap<String, Object>();
 
