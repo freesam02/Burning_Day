@@ -4,7 +4,24 @@ import json
 from time import sleep
 
 
+def update_recommend(company_name):
+    #들어갈 기업명들 강제로 채워야 함
+    f = open("json_note.txt", 'r',encoding='utf-8-sig')
+    company_data = f.read()
+    company_info = json.loads(company_data)
+    f.close()
+    url ="http://127.0.0.1:8080/recommend"+"?id="+str(company_info[company_name])
 
+    response = requests.get(url)
+    print(response.content)
+
+    data = response.content.decode('utf-8')
+    client = MongoClient("127.0.0.1", 27017)
+    db = client.shop
+    collection = db.products
+    myquery = {"meta_description": str(company_info[company_name])}
+    new_values = {"$set": {"description" : data}}
+    collection.update_one(myquery, new_values)
 
 def update_price(company_name):
     #들어갈 기업명들 강제로 채워야 함
@@ -75,6 +92,6 @@ while(True):
     for product in company_info.keys():
         update_price(product)
         update_info(product)
+        update_recommend(product)
 
     sleep(1)
-
