@@ -5,6 +5,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,8 @@ import com.koscom.burning.util.HttpClientUtil;
 @Controller
 public class RecommendStockApi {
 	
+	Logger logger = LoggerFactory.getLogger(RecommendStockApi.class);
+	
     private static String URI_PREFIX = "http://localhost:8888/logpresso/httpexport/query.json";
 	//private static String APIKEY = "847d4dcc-7284-bfa5-e447-b3c48cded77b";
 	private static String APIKEY = "dd579650-45ca-4b3a-1fc4-57308be36625";
@@ -35,6 +39,8 @@ public class RecommendStockApi {
 	@RequestMapping(value="/recommend")
 	public @ResponseBody String getRecommendData(Model model, @RequestParam("id") String id) throws JsonParseException, JsonMappingException, IOException  {
 		
+		logger.info("api is called");
+		
 		String comName = null;
 		String recName = null;
 		String industryCode = null;
@@ -45,6 +51,11 @@ public class RecommendStockApi {
 		// 1. 기업명
 		query = "table market_join_simple | search 단축코드 == \"" + id + "\" | limit 1 | fields 기업명, 산업코드";
 		map = this.callLogpresso(query);
+		
+		if(map == null || map.equals("")) {
+			sb.append("해당 기업의 거래내역이 없습니다.");
+			return sb.toString();
+		}
 		
 		comName = map.get("기업명").toString();
 		industryCode = map.get("산업코드").toString();
@@ -104,11 +115,17 @@ public class RecommendStockApi {
 	
 	private Map callLogpresso(String query) throws JsonParseException, JsonMappingException, IOException {
 		
+		
 		String jsonStr = null;
 		jsonStr = httpClientUtil.execute(URI_PREFIX + "?_apikey=" + URLEncoder.encode(APIKEY, "UTF-8") 
 		+ "&_q=" + URLEncoder.encode(query, "UTF-8"));
 		
-		map = mapper.readValue(jsonStr, new TypeReference<Map<String, String>>(){});
+		if(jsonStr != "" && !jsonStr.isEmpty() ) {
+			map = mapper.readValue(jsonStr, new TypeReference<Map<String, String>>(){});
+		} else {
+			map = null;
+		}
+		
 		
 		return map;
 	}
